@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智慧教育链接转换工具</title>
+    <style>
+        :root {
+            --bg: #f0f4f8;
+            --card-bg: #ffffff;
+            --primary: #4a6cf7;
+            --primary-hover: #3651d5;
+            --primary-light: #eef1fe;
+            --text: #2d3748;
+            --text-secondary: #5a6c7d;
+            --text-muted: #8899a8;
+            --border: #e2e8f0;
+            --border-focus: #4a6cf7;
+            --success: #38a169;
+            --success-bg: #f0fff4;
+            --warning: #d69e2e;
+            --warning-bg: #fffff0;
+            --error: #e53e3e;
+            --error-bg: #fff5f5;
+            --info-bg: #ebf8ff;
+            --info-text: #2b6cb0;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+            --shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+            --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.10), 0 4px 12px rgba(0, 0, 0, 0.05);
+            --radius-sm: 8px;
+            --radius: 12px;
+            --radius-lg: 16px;
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --font-mono: 'SF Mono', 'Cascadia Code', 'Consolas', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #e8edf5 0%, #dce3ed 25%, #eef1f7 50%, #e3e9f2 75%, #edf0f6 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 背景装饰 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -180px;
+            right: -120px;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(74, 108, 247, 0.06) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -140px;
+            left: -100px;
+            width: 420px;
+            height: 420px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(56, 161, 105, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 720px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 主卡片 */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: 36px 32px 32px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(226, 232, 240, 0.7);
+            transition: all var(--transition);
+        }
+
+        /* 头部 */
+        .header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+        .header .icon-wrapper {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: var(--primary-light);
+            margin-bottom: 16px;
+            transition: transform var(--transition);
+        }
+        .header .icon-wrapper:hover {
+            transform: scale(1.05);
+        }
+        .header .icon-wrapper svg {
+            width: 28px;
+            height: 28px;
+            color: var(--primary);
+        }
+        .header h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: -0.3px;
+            margin: 0 0 6px;
+        }
+        .header .subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        /* 输入区域 */
+        .input-section {
+            margin-bottom: 20px;
+        }
+        .input-section label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            letter-spacing: 0.2px;
+        }
+        .input-row {
+            display: flex;
+            gap: 10px;
+            align-items: stretch;
+        }
+        .input-row input {
+            flex: 1;
+            padding: 13px 16px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            font-family: var(--font-mono);
+            color: var(--text);
+            background: #fafbfc;
+            transition: all var(--transition);
+            outline: none;
+            min-width: 0;
+            letter-spacing: -0.1px;
+        }
+        .input-row input::placeholder {
+            color: #bcc5cf;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            font-size: 0.9rem;
+            letter-spacing: 0;
+        }
+        .input-row input:focus {
+            border-color: var(--border-focus);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(74, 108, 247, 0.08);
+        }
+        .input-row input.error {
+            border-color: var(--error);
+            background: #fffafa;
+            animation: shake 0.4s ease;
+        }
+        @keyframes shake {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            20% {
+                transform: translateX(-6px);
+            }
+            40% {
+                transform: translateX(6px);
+            }
+            60% {
+                transform: translateX(-4px);
+            }
+            80% {
+                transform: translateX(4px);
+            }
+        }
+
+        .btn-paste {
+            flex-shrink: 0;
+            padding: 13px 16px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: #fafbfc;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all var(--transition);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            user-select: none;
+        }
+        .btn-paste:hover {
+            background: #f0f4f8;
+            border-color: #cdd5e0;
+            color: var(--text);
+        }
+        .btn-paste:active {
+            background: #e8edf3;
+            transform: scale(0.97);
+        }
+        .btn-paste svg {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+
+        /* 预览区域 */
+        .preview-section {
+            margin-bottom: 20px;
+            background: #f8fafc;
+            border-radius: var(--radius-sm);
+            padding: 16px 18px;
+            border: 1px solid var(--border);
+            transition: all var(--transition);
+            min-height: 52px;
+            display: flex;
+            align-items: center;
+            word-break: break-all;
+        }
+        .preview-section.has-changes {
+            background: #f9fdfb;
+            border-color: #c6e9d6;
+            box-shadow: 0 0 0 3px rgba(56, 161, 105, 0.04);
+        }
+        .preview-section.no-changes {
+            background: #fefefe;
+            border-color: #e8dca0;
+            box-shadow: 0 0 0 3px rgba(214, 158, 46, 0.04);
+        }
+        .preview-section.empty {
+            background: #fafbfc;
+            border-color: var(--border);
+            box-shadow: none;
+            justify-content: center;
+        }
+        .preview-content {
+            font-family: var(--font-mono);
+            font-size: 0.88rem;
+            color: var(--text);
+            line-height: 1.6;
+            width: 100%;
+        }
+        .preview-content .highlight-change {
+            background: #d4fce4;
+            color: #1a6b3c;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 0;
+            white-space: nowrap;
+        }
+        .preview-content .highlight-original {
+            background: #fff3cd;
+            color: #8b6914;
+            padding: 2px 5px;
+            border-radius: 4px;
+            text-decoration: line-through;
+            font-size: 0.82rem;
+            opacity: 0.7;
+            white-space: nowrap;
+        }
+        .preview-placeholder {
+            color: #c5cdd8;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+
+        /* 替换统计标签 */
+        .changes-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 5px 10px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+            transition: all var(--transition);
+        }
+        .changes-badge.success {
+            background: #e6f9f0;
+            color: #1a6b3c;
+        }
+        .changes-badge.warning {
+            background: #fef9e7;
+            color: #8b6914;
+        }
+        .changes-badge.info {
+            background: #e8f4fd;
+            color: #2b6cb0;
+        }
+
+        /* 按钮组 */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 12px 22px;
+            border-radius: var(--radius-sm);
+            font-size: 0.93rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            letter-spacing: 0.2px;
+            user-select: none;
+            white-space: nowrap;
+            text-decoration: none;
+        }
+        .btn:active {
+            transform: scale(0.96);
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            flex: 1;
+            min-width: 160px;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(74, 108, 247, 0.25);
+        }
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            box-shadow: 0 4px 16px rgba(74, 108, 247, 0.35);
+            transform: translateY(-1px);
+        }
+        .btn-primary:active {
+            transform: scale(0.96) translateY(0);
+            box-shadow: 0 1px 4px rgba(74, 108, 247, 0.2);
+        }
+        .btn-primary:disabled {
+            background: #b0bec5;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+        .btn-primary:disabled:hover {
+            background: #b0bec5;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .btn-outline {
+            background: #fff;
+            color: var(--text-secondary);
+            border: 2px solid var(--border);
+            flex-shrink: 0;
+        }
+        .btn-outline:hover {
+            background: #f8fafc;
+            border-color: #cdd5e0;
+            color: var(--text);
+        }
+        .btn-outline:active {
+            background: #eef2f6;
+        }
+        .btn-outline svg {
+            width: 17px;
+            height: 17px;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-muted);
+            border: none;
+            padding: 8px 12px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+        .btn-ghost:hover {
+            color: var(--text-secondary);
+            background: #f7f9fb;
+            border-radius: 6px;
+        }
+
+        /* Toast 提示 */
+        .toast {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-120px);
+            background: #2d3748;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        .toast.success {
+            background: #2d6a4f;
+        }
+        .toast.error {
+            background: #c53030;
+        }
+        .toast svg {
+            width: 17px;
+            height: 17px;
+            flex-shrink: 0;
+        }
+
+        /* Footer */
+        .footer-note {
+            text-align: center;
+            margin-top: 18px;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+        .footer-note code {
+            background: #eef1f7;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: #5a6c7d;
+        }
+
+        /* 响应式 */
+        @media (max-width: 600px) {
+            .card {
+                padding: 24px 18px 22px;
+                border-radius: var(--radius);
+            }
+            .header h1 {
+                font-size: 1.3rem;
+            }
+            .header .icon-wrapper {
+                width: 44px;
+                height: 44px;
+                border-radius: 12px;
+            }
+            .header .icon-wrapper svg {
+                width: 22px;
+                height: 22px;
+            }
+            .input-row {
+                flex-direction: column;
+                gap: 8px;
+            }
+            .btn-paste {
+                justify-content: center;
+                padding: 11px;
+            }
+            .btn-group {
+                flex-direction: column;
+            }
+            .btn {
+                width: 100%;
+                justify-content: center;
+                padding: 14px;
+            }
+            .btn-outline {
+                order: 2;
+            }
+            .preview-section {
+                padding: 12px 14px;
+            }
+            .preview-content {
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 380px) {
+            body {
+                padding: 10px;
+            }
+            .card {
+                padding: 18px 14px 16px;
+            }
+            .header h1 {
+                font-size: 1.15rem;
+            }
+            .input-row input {
+                font-size: 0.82rem;
+                padding: 11px 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Toast 提示 -->
+    <div class="toast" id="toast"></div>
+
+    <!-- 主容器 -->
+    <div class="container">
+        <div class="card">
+            <!-- 头部 -->
+            <div class="header">
+                <div class="icon-wrapper">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                    </svg>
+                </div>
+                <h1>智慧教育链接转换</h1>
+                <p class="subtitle">自动替换链接参数，快速跳转目标页面</p>
+            </div>
+
+            <!-- 输入区域 -->
+            <div class="input-section">
+                <label for="urlInput">📎 粘贴原始链接</label>
+                <div class="input-row">
+                    <input
+                    type="text"
+                    id="urlInput"
+                    placeholder="https://basic.smartedu.cn/tchMaterial/detail?contentType=assets_document&..."
+                    autocomplete="off"
+                    spellcheck="false"
+                    >
+                    <button class="btn-paste" id="btnPaste" title="从剪贴板粘贴">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                        </svg>
+                        粘贴
+                    </button>
+                </div>
+            </div>
+
+            <!-- 替换统计 -->
+            <div id="changesIndicator" style="min-height: 0; transition: all 0.25s;"></div>
+
+            <!-- 预览区域 -->
+            <div class="preview-section empty" id="previewSection">
+                <span class="preview-placeholder" id="previewPlaceholder">替换后的链接将在这里预览</span>
+                <div class="preview-content" id="previewContent" style="display:none;"></div>
+            </div>
+
+            <!-- 按钮组 -->
+            <div class="btn-group">
+                <button class="btn btn-primary" id="btnOpen" disabled>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                        <polyline points="15 3 21 3 21 9"/>
+                        <line x1="10" y1="14" x2="21" y2="3"/>
+                    </svg>
+                    打开替换后的链接
+                </button>
+                <button class="btn btn-outline" id="btnCopy" disabled title="复制替换后的链接">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="8" y="8" width="12" height="12" rx="2"/>
+                        <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>
+                    </svg>
+                    复制链接
+                </button>
+                <button class="btn btn-ghost" id="btnClear" title="清空输入">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                    清空
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        (function() {
+            // DOM 元素
+            const urlInput = document.getElementById('urlInput');
+            const btnPaste = document.getElementById('btnPaste');
+            const btnOpen = document.getElementById('btnOpen');
+            const btnCopy = document.getElementById('btnCopy');
+            const btnClear = document.getElementById('btnClear');
+            const previewSection = document.getElementById('previewSection');
+            const previewPlaceholder = document.getElementById('previewPlaceholder');
+            const previewContent = document.getElementById('previewContent');
+            const changesIndicator = document.getElementById('changesIndicator');
+            const toast = document.getElementById('toast');
+
+            // 状态
+            let currentOriginalUrl = '';
+            let currentNewUrl = '';
+            let changeCount = 0;
+            let toastTimer = null;
+
+            // 显示 Toast
+            function showToast(message, type = '') {
+                if (toastTimer) clearTimeout(toastTimer);
+                toast.textContent = '';
+                toast.className = 'toast ' + type;
+                // 使用 innerHTML 以支持简单图标
+                const iconMap = {
+                    'success': '✅ ',
+                    'error': '⚠️ ',
+                    '': 'ℹ️ '
+                };
+                toast.textContent = (iconMap[type] || '') + message;
+                // 强制回流
+                void toast.offsetWidth;
+                toast.classList.add('show');
+                toastTimer = setTimeout(() => {
+                    toast.classList.remove('show');
+                    toastTimer = null;
+                }, 2200);
+            }
+
+            // 处理URL替换
+            function processUrl(rawUrl) {
+                if (!rawUrl || !rawUrl.trim()) {
+                    return { url: '', changes: 0, details: [], valid: false, error: 'empty' };
+                }
+
+                let input = rawUrl.trim();
+
+                // 自动补全协议
+                if (!/^https?:\/\//i.test(input)) {
+                    // 检查是否看起来像URL
+                    if (/^[\w.-]+(\.[\w.-]+)+[\w./?=&%#-]*/i.test(input) || input.includes('.')) {
+                        input = 'https://' + input;
+                    } else {
+                        return { url: input, changes: 0, details: [], valid: false, error: 'invalid_format' };
+                    }
+                }
+
+                let parsedUrl;
+                try {
+                    parsedUrl = new URL(input);
+                } catch (e) {
+                    return { url: input, changes: 0, details: [], valid: false, error: 'parse_error' };
+                }
+
+                const params = new URLSearchParams(parsedUrl.search);
+                const changes = [];
+                let modified = false;
+
+                // 检查并替换 contentType
+                const contentTypeValue = params.get('contentType');
+                if (contentTypeValue === 'assets_document') {
+                    params.set('contentType', 'x_url');
+                    changes.push({
+                        param: 'contentType',
+                        from: 'assets_document',
+                        to: 'x_url'
+                    });
+                    modified = true;
+                }
+
+                // 检查并替换 catalogType
+                const catalogTypeValue = params.get('catalogType');
+                if (catalogTypeValue === 'tchMaterial') {
+                    params.set('catalogType', 'elecedu');
+                    changes.push({
+                        param: 'catalogType',
+                        from: 'tchMaterial',
+                        to: 'elecedu'
+                    });
+                    modified = true;
+                }
+
+                if (modified) {
+                    parsedUrl.search = params.toString();
+                }
+
+                const newUrl = parsedUrl.toString();
+
+                return {
+                    url: newUrl,
+                    changes: changes.length,
+                    details: changes,
+                    valid: true,
+                    modified: modified,
+                    originalUrl: rawUrl.trim(),
+                    parsedUrl: parsedUrl,
+                    params: params,
+                };
+            }
+
+            // 构建高亮预览HTML
+            function buildPreviewHtml(originalUrl, newUrl, details, modified) {
+                if (!modified || details.length === 0) {
+                    // 没有变化，直接显示URL
+                    return {
+                        html: escapeHtml(newUrl),
+                        hasChanges: false
+                    };
+                }
+
+                // 构建高亮版本：在新URL中高亮被替换的参数值
+                let highlighted = escapeHtml(newUrl);
+                // 对每个变更，在新URL中找到对应参数并高亮
+                details.forEach(detail => {
+                    const searchPattern = detail.param + '=' + escapeRegExp(detail.to);
+                    const replacePattern = detail.param +
+                        '=<span class="highlight-change">' + escapeHtml(detail.to) + '</span>';
+                    // 使用正则替换（只替换参数值部分）
+                    const regex = new RegExp('(' + escapeRegExp(detail.param) + '=)(' +
+                        escapeRegExp(detail.to) + ')(?=&|#|$)', 'g');
+                    highlighted = highlighted.replace(regex, '$1<span class="highlight-change">$2</span>');
+                });
+
+                return {
+                    html: highlighted,
+                    hasChanges: true
+                };
+            }
+
+            function escapeHtml(str) {
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+
+            function escapeRegExp(str) {
+                return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            }
+
+            // 更新预览
+            function updatePreview(result) {
+                // 更新预览区域
+                previewSection.classList.remove('has-changes', 'no-changes', 'empty');
+
+                if (!result.valid) {
+                    // 无效URL
+                    if (result.error === 'empty') {
+                        previewSection.classList.add('empty');
+                        previewPlaceholder.style.display = 'block';
+                        previewPlaceholder.textContent = '替换后的链接将在这里预览';
+                        previewContent.style.display = 'none';
+                        changesIndicator.innerHTML = '';
+                        btnOpen.disabled = true;
+                        btnCopy.disabled = true;
+                        currentNewUrl = '';
+                        changeCount = 0;
+                    } else {
+                        previewSection.classList.add('no-changes');
+                        previewPlaceholder.style.display = 'block';
+                        previewPlaceholder.textContent = '⚠️ 请输入有效的URL地址';
+                        previewPlaceholder.style.color = '#e53e3e';
+                        previewContent.style.display = 'none';
+                        changesIndicator.innerHTML = '';
+                        btnOpen.disabled = true;
+                        btnCopy.disabled = true;
+                        currentNewUrl = '';
+                        changeCount = 0;
+                    }
+                    return;
+                }
+
+                // 恢复占位符颜色
+                previewPlaceholder.style.color = '';
+
+                if (result.modified && result.changes > 0) {
+                    // 有替换
+                    previewSection.classList.add('has-changes');
+                    previewPlaceholder.style.display = 'none';
+                    previewContent.style.display = 'block';
+                    const previewData = buildPreviewHtml(result.originalUrl, result.url, result.details, true);
+                    previewContent.innerHTML = previewData.html;
+                    btnOpen.disabled = false;
+                    btnCopy.disabled = false;
+                    currentNewUrl = result.url;
+                    changeCount = result.changes;
+
+                    // 更新统计标签
+                    changesIndicator.innerHTML =
+                        '<span class="changes-badge success">✅ 已检测到 <strong>' + result.changes +
+                        '</strong> 处可替换</span>';
+                    result.details.forEach(d => {
+                        changesIndicator.innerHTML +=
+                            ' <span style="font-size:0.75rem;color:#5a6c7d;margin-left:2px;">(' +
+                            escapeHtml(d.param) + ': <span style="text-decoration:line-through;color:#b0a060;">' +
+                            escapeHtml(d.from) + '</span> → <strong style="color:#1a6b3c;">' + escapeHtml(d
+                                .to) + '</strong>)</span>';
+                    });
+                } else {
+                    // 没有需要替换的内容
+                    previewSection.classList.add('no-changes');
+                    previewPlaceholder.style.display = 'none';
+                    previewContent.style.display = 'block';
+                    previewContent.innerHTML = escapeHtml(result.url);
+                    btnOpen.disabled = false;
+                    btnCopy.disabled = false;
+                    currentNewUrl = result.url;
+                    changeCount = 0;
+
+                    changesIndicator.innerHTML =
+                        '<span class="changes-badge warning">ℹ️ 未检测到需要替换的参数，链接保持不变</span>';
+                }
+            }
+
+            // 处理输入变化
+            function handleInput() {
+                const rawUrl = urlInput.value;
+                currentOriginalUrl = rawUrl;
+                const result = processUrl(rawUrl);
+                updatePreview(result);
+            }
+
+            // 打开链接
+            function openLink() {
+                if (!currentNewUrl) return;
+                // 在新标签页打开
+                const newWindow = window.open(currentNewUrl, '_blank', 'noopener,noreferrer');
+                if (!newWindow) {
+                    showToast('弹窗被拦截，请允许本站弹窗或手动复制链接打开', 'error');
+                } else {
+                    showToast('已在新建标签页中打开链接', 'success');
+                }
+            }
+
+            // 复制链接
+            async function copyLink() {
+                if (!currentNewUrl) return;
+                try {
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        await navigator.clipboard.writeText(currentNewUrl);
+                        showToast('链接已复制到剪贴板', 'success');
+                    } else {
+                        // 回退方案
+                        fallbackCopy(currentNewUrl);
+                    }
+                } catch (err) {
+                    // 尝试回退
+                    fallbackCopy(currentNewUrl);
+                }
+            }
+
+            function fallbackCopy(text) {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.style.position = 'fixed';
+                textarea.style.left = '-9999px';
+                textarea.style.top = '-9999px';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.focus();
+                textarea.select();
+                try {
+                    const success = document.execCommand('copy');
+                    if (success) {
+                        showToast('链接已复制到剪贴板', 'success');
+                    } else {
+                        showToast('复制失败，请手动选择链接复制', 'error');
+                    }
+                } catch (e) {
+                    showToast('复制失败，请手动选择链接复制', 'error');
+                }
+                document.body.removeChild(textarea);
+            }
+
+            // 从剪贴板粘贴
+            async function pasteFromClipboard() {
+                try {
+                    if (navigator.clipboard && navigator.clipboard.readText) {
+                        const text = await navigator.clipboard.readText();
+                        if (text && text.trim()) {
+                            urlInput.value = text.trim();
+                            handleInput();
+                            showToast('已从剪贴板粘贴', 'success');
+                            urlInput.focus();
+                        } else {
+                            showToast('剪贴板为空', 'error');
+                        }
+                    } else {
+                        showToast('不支持读取剪贴板，请手动粘贴 (Ctrl+V)', 'error');
+                    }
+                } catch (err) {
+                    if (err.name === 'NotAllowedError') {
+                        showToast('请授权剪贴板访问权限后重试', 'error');
+                    } else {
+                        showToast('无法读取剪贴板，请手动粘贴', 'error');
+                    }
+                }
+            }
+
+            // 清空
+            function clearAll() {
+                urlInput.value = '';
+                currentOriginalUrl = '';
+                currentNewUrl = '';
+                changeCount = 0;
+                previewSection.classList.remove('has-changes', 'no-changes');
+                previewSection.classList.add('empty');
+                previewPlaceholder.style.display = 'block';
+                previewPlaceholder.textContent = '替换后的链接将在这里预览';
+                previewPlaceholder.style.color = '';
+                previewContent.style.display = 'none';
+                previewContent.innerHTML = '';
+                changesIndicator.innerHTML = '';
+                btnOpen.disabled = true;
+                btnCopy.disabled = true;
+                urlInput.focus();
+                showToast('已清空', '');
+            }
+
+            // 事件监听
+            urlInput.addEventListener('input', handleInput);
+            urlInput.addEventListener('paste', () => {
+                // 延迟处理，等待粘贴完成
+                setTimeout(handleInput, 50);
+            });
+            urlInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    if (currentNewUrl && !btnOpen.disabled) {
+                        openLink();
+                    }
+                }
+            });
+
+            btnPaste.addEventListener('click', pasteFromClipboard);
+            btnOpen.addEventListener('click', openLink);
+            btnCopy.addEventListener('click', copyLink);
+            btnClear.addEventListener('click', clearAll);
+
+            // 初始化：尝试自动读取剪贴板（仅在安全上下文且有内容时）
+            async function autoDetectClipboard() {
+                try {
+                    if (navigator.clipboard && navigator.clipboard.readText) {
+                        const text = await navigator.clipboard.readText();
+                        if (text && text.trim() && /smartedu\.cn|contentType=|catalogType=/i.test(text)) {
+                            urlInput.value = text.trim();
+                            handleInput();
+                            // 不显示toast，静默填充
+                        }
+                    }
+                } catch (e) {
+                    // 静默失败，不打扰用户
+                }
+            }
+
+            // 页面加载完成后自动检测
+            setTimeout(autoDetectClipboard, 300);
+
+            // 初始聚焦输入框
+            setTimeout(() => {
+                if (!urlInput.value) {
+                    urlInput.focus();
+                }
+            }, 400);
+
+            console.log('✅ 智慧教育链接转换工具已就绪');
+            console.log('   替换规则: contentType=assets_document → contentType=x_url');
+            console.log('   替换规则: catalogType=tchMaterial → catalogType=elecedu');
+            console.log('   支持 Enter 键快速打开链接');
+        })();
+    </script>
+</body>
+</html>
